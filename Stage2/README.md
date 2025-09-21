@@ -11,6 +11,72 @@
 
 یعنی در عمل: BLE Scan → parse AD → queue sighting → (گزینش/اتخاذ تصمیم) → connect GATT → challenge/response.
 
+چیزهایی که مو به مو باید یاد بگیری (فهرست دقیق + هدف هرکدام)
+
+مبانی BLE (نظری کوتاه، اما ضروری)
+
+چی یاد بگیری: فرق GAP و GATT، Advertising vs. Scanning، Peripheral vs. Central، AD fields (فرمت [len][type][data])، AD type 0xFF (Manufacturer Specific).
+
+هدف: بفهمی کجا دنبال EID باشی و چرا RSSI در advertising هست.
+
+تمرین: با nRF Connect روی گوشی ببین چگونه advertising ساخته می‌شود (Manufacturer data را وارد کن).
+
+RSSI — مفهوم و رفتار عملی
+
+چی یاد بگیری: RSSI مقدار به دسی‌بل (dBm) است؛ نویز، فاصله، جهت و مانع روی آن تاثیر می‌گذارد؛ نوسان دارد → باید صاف‌سازی (EMA) و hysteresis داشته باشی.
+
+هدف: بدان چگونه مقدار RSSI را جمع‌آوری، smooth و برای «نزدیکی» تصمیم‌گیری کنی.
+
+تمرین: با یک beacon گوشی را از نزدیک به دور منتقل کن و در لاگ ESP32 تغییر RSSI را ثبت کن.
+
+NimBLE در ESP-IDF — راه‌اندازی و APIهای پایه
+
+چی یاد بگیری: چگونه host+controller را init کنی، چگونه اسکن را با ble_gap_disc() شروع کنی و callback رو (ble_gap_event) ثبت کنی.
+
+هدف: بتوانی اسکن را start/stop کنی و event‌های BLE_GAP_EVENT_DISC را دریافت کنی.
+
+تمرین: از مثال‌های رسمی (blecent, bleprph, NimBLE_GATT_Server) کپی‌پیست کن و روی برد اجرا کن.
+
+پارسر Advertisement (AD fields)
+
+چی یاد بگیری: الگوریتم خواندن [len][type][data] و استخراج type==0xFF و گرفتن 16 بایت اول (EID).
+
+هدف: ساختن ble_sighting_t با eid[16], rssi, addr[6], timestamp.
+
+تمرین: در callback اسکن، AD را پارس کن و اگر Manufacturer data با حداقل 16 بایت بود، یک struct بساز و به queue بفرست.
+
+FreeRTOS integration (Task + Queue)
+
+چی یاد بگیری: ایجاد queue برای sightingها، یک task برای اسکن و یک consumer task برای پردازش/چاپ.
+
+هدف: جداسازی وظایف — اسکن real-time و پردازش در task دیگر.
+
+تمرین: بساز xQueueCreate(32, sizeof(ble_sighting_t))، xQueueSend() در callback و در task دیگر xQueueReceive().
+
+GATT Client ↔ GATT Server عملی
+
+چی یاد بگیری: مراحل کلی (connect → discover service → discover characteristics → subscribe notifications → write/read) و APIهای مربوطه (ble_gattc_open, discovery calls, ble_gattc_write_flat, subscription).
+
+هدف: بتوانی از ESP32 به گوشی (که با nRF Connect به‌صورت Peripheral/Server ساخته‌ای) وصل شوی، داده بنویسی و notification بگیری.
+
+تمرین: با دو characteristic ساده (CHAL + RESP) کار کن: ESP به‌عنوان client CHAL می‌فرستد و برای RESP subscribe می‌کند تا notification دریافت کند.
+
+چالش ساده (Challenge) — طراحی و پیاده‌سازی
+
+چی یاد بگیری: پروتکل چالش ساده (نحوه ساخت CHAL، چه چیزی داخلش باشد: nonce, door_id, ts) و نحوه اعتبارسنجی پاسخ (مثلاً پاسخ == hash(nonce+door_id) یا در حد اولیه nonce+1).
+
+هدف: پیاده‌سازی چرخه CHAL→RESP با timeout و log latency.
+
+تمرین: اجرای دستی با nRF Connect (در ابتدا) و سپس خودکار کردن پاسخ در یک اپ ساده روی گوشی یا با ابزار دسکتاپ.
+
+اندازه‌گیری و دیباگ (latency, logs, reconnect)
+
+چی یاد بگیری: استفاده از esp_timer_get_time() برای timestamp، لاگ‌گذاری دقیق و شمارنده‌ها (scan events, connections, challenges, success/fail).
+
+هدف: بتوانی زمان CHAL→RESP و کل چرخه را اندازه بگیری و معیار ≤500 ms را بررسی کنی.
+
+تمرین: لاگ بگیر و اختلاف timestamp‌ها را محاسبه کن؛ اگر زیاد است، پروفایل کن (کجا تاخیر می‌آید؟ اتصال؟ discovery؟).
+
 1. BLE Fundamentals (Short Theory, but Essential)
 
 What to learn:
