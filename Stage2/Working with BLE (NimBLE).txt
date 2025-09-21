@@ -1,0 +1,78 @@
+🔹 Stage 2 – Working with BLE (NimBLE)
+Step 1: Learn BLE Scanning
+
+Goal: Understand how the ESP32 scans for nearby BLE devices.
+
+What to Learn:
+
+How to enable BLE scanning in ESP-IDF using NimBLE.
+
+How to list detected devices (name, MAC address, and type).
+
+How to extract the RSSI (signal strength) of each device.
+
+Step 2: Extract and Use RSSI
+
+Goal: Learn how to read and use RSSI values.
+
+What to Learn:
+
+How to log RSSI values for each scanned device.
+
+How to filter devices based on RSSI (e.g., detect if a device is near or far).
+
+This prepares you for proximity-based logic (e.g., unlocking a door if your phone is close).
+
+Step 3: Practice GATT Communication (Client ↔ Server)
+
+Goal: Understand the two BLE roles and make them communicate.
+
+What to Learn:
+
+Difference between GATT Server (ESP32 or phone) and GATT Client (ESP32 or phone).
+
+How to set up ESP32 as a GATT Server (expose services & characteristics).
+
+How to set up ESP32 as a GATT Client (read/write to another device’s services).
+
+Simple experiments:
+
+ESP32 Server ↔ Phone App Client.
+
+ESP32 Client ↔ Phone App Server.
+
+Step 4: Build a Simple “Challenge”
+
+Goal: Add a basic security mechanism.
+
+What to Learn:
+
+Send a small piece of data (challenge) from ESP32 to phone.
+
+Phone responds with the correct reply.
+
+ESP32 verifies the reply before granting access (like a digital handshake).
+
+Example:
+
+ESP32 sends random number 1234.
+
+Phone must reply with 5678 (predefined rule).
+
+If correct → ESP32 accepts.
+
+⏳ Estimated time to complete Stage 2: 3–4 weeks
+
+Week 1: BLE Scanning + RSSI
+
+Week 2: GATT Basics (Server ↔ Client)
+
+Week 3–4: Challenge mechanism + practice
+
+👉 The main goal of this stage:
+
+Be able to scan, filter, and connect to BLE devices,
+
+Understand GATT communication,
+
+Implement a basic secure exchange between ESP32 and a smartphone.
