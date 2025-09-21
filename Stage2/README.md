@@ -1,3 +1,16 @@
+
+هدف کلی این مرحله
+
+تا آخر این مرحله باید بتوانی یک کامپوننت BLE Scanner بسازی که:
+
+تبلیغات (advertisements) را پیوسته می‌خواند و از آن EID / Manufacturer data را استخراج می‌کند،
+
+برای هر دیده شدن، addr + RSSI + timestamp را به یک queue می‌فرستد،
+
+بتوانی روی همان برد به یک گوشی (که به‌عنوان Peripheral/Server عمل می‌کند) GATT Client وصل شوی، CHAL ارسال کنی و RESP دریافت و بررسی کنی (timeout قابل تنظیم، هدف اولیه ≤ 500 ms برای چرخه CHAL→RESP).
+
+یعنی در عمل: BLE Scan → parse AD → queue sighting → (گزینش/اتخاذ تصمیم) → connect GATT → challenge/response.
+
 1. BLE Fundamentals (Short Theory, but Essential)
 
 What to learn:
